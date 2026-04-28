@@ -99,7 +99,7 @@ export function BaseTagBadge({ children, className = "" }) {
     <span
       className={`
         inline-flex items-center gap-1 px-2 pb-[5px] pt-[4px] rounded-full
-        text-[${BADGE_TEXT_SIZE}px] font-medium leading-none
+        text-[${BADGE_TEXT_SIZE}px] font-medium leading-none capitalize
         ${className}
       `}
     >
@@ -113,7 +113,7 @@ export function BaseTagBadge({ children, className = "" }) {
 
 export function ToneBadge({ tone, className }) {
     return <BaseTagBadge className={getToneClasses(tone) + " " + className}>
-        {toTitleCase(tone)}
+        {tone}
     </BaseTagBadge>;
 }
 
@@ -146,7 +146,7 @@ export function VibeBadge({ category, value }) {
                 fill={isFilled ? "currentColor" : "none"}
                 className="shrink-0"
             />
-            {toTitleCase(entry.label || value)}
+            {entry.label || value}
         </BaseTagBadge>
     );
 }
@@ -180,10 +180,10 @@ export function MatchScoreBadge({ score }) {
     );
 }
 
-const toTitleCase = (str) => {
-    if (!str) return "";
-    return str
-        .split(/[\s_-]+/)        // split on spaces, underscores, hyphens
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-}
+// const toTitleCase = (str) => {
+//     if (!str) return "";
+//     return str
+//         .split(/[\s_-]+/)        // split on spaces, underscores, hyphens
+//         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+//         .join(" ");
+// }

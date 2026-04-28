@@ -42,7 +42,7 @@ export default function DramaCard({ drama, showEnding=false }) {
 
     return (
         <Card
-            // onClick={() => navigate(`/title/${slug}`)}
+            onClick={() => navigate(`/title/${slug}`)}
             className="
                 p-0 gap-0
                 group relative flex flex-col rounded-xl overflow-hidden
