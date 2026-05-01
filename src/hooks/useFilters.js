@@ -22,15 +22,15 @@ export const DEFAULT_FILTERS = {
     tones: [],
     platforms: [],
 
-    runtime_range: [null, null],
-    episodes_range: [null, null],
-    rating_range: [0, 10],
-    year_range: [2000, new Date().getFullYear()],
+    runtime: [null, null],
+    episodes: [null, null],
+    rating: [null, null],
+    year: [null, null],
 
-    sort_by: "rating",
-    sort_order: "desc",
+    sort_by: "", //"rating",
+    sort_order: "", // "desc",
 
-    mode: "vibe",
+    mode: "", // "vibe",
     query: ""
 }
 
@@ -46,22 +46,22 @@ export const FILTER_CONFIG = {
     tones: { type: "multiselect", component: MultiSelectTags },
     platforms: { type: "multiselect", component: MultiSelectTags },
 
-    runtime_range: { type: "range", component: RangeInput },
-    episodes_range: { type: "range", component: RangeInput },
-    rating_range: {
+    runtime: { type: "range", component: RangeInput },
+    episodes: { type: "range", component: RangeInput },
+    rating: {
         type: "range",
-        minValue: DEFAULT_FILTERS.rating_range[0],
-        maxValue: DEFAULT_FILTERS.rating_range[1],
+        minValue: 0,
+        maxValue: 10,
         step: 0.5,
         component: RangeSlider,
         componentProps: {
             step: 0.5
         }
     },
-    year_range: {
+    year: {
         type: "range",
-        minValue: DEFAULT_FILTERS.year_range[0],
-        maxValue: DEFAULT_FILTERS.year_range[1],
+        minValue: 2000,
+        maxValue: new Date().getFullYear(),
 
         component: RangeSlider,
         componentProps: {
@@ -86,21 +86,26 @@ export const FILTER_CONFIG = {
     },
     query : {
         type: "value"
+    },
+    page: {
+        type: "value"
     }
 }
 
 export function useFilters() {
-    const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS)
+    const [appliedFilters, _setAppliedFilters] = useState(DEFAULT_FILTERS)
     const [filterConfig, setFilterConfig] = useState(null)
+
+    const setAppliedFilters = (arg) => {console.log("[setAppliedFilters]", arg); _setAppliedFilters(arg)}
 
     useEffect(() => {
         const fetchFilterOptions = async () => {
             try {
-                console.log("Fetching filter options ...")
+                console.log("[fetchFilterOptions] fetching ...")
                 const res = await getFilterOptions()
-                console.log("Got filter options: ", res)
+                console.log("[fetchFilterOptions] got filter options: ", res)
                 if (!res?.filter_options) {
-                    console.error("filter_options not found!")
+                    console.error("[fetchFilterOptions] filter_options not found!")
                     return;
                 }
 
@@ -116,7 +121,7 @@ export function useFilters() {
                 setFilterConfig(config)
 
             } catch (error) {
-                console.log("Unable to get filter options", error)
+                console.log("[fetchFilterOptions] Unable to get filter options", error)
             }
         }
         fetchFilterOptions()
@@ -126,7 +131,7 @@ export function useFilters() {
         setAppliedFilters(prev => ({ ...prev, [key]: value }));
     };
 
-    const resetFilters = () => setAppliedFilters(DEFAULT_FILTERS);
+    const resetFilters = () => setAppliedFilters({...DEFAULT_FILTERS, query: appliedFilters.query});
 
 
     const buildSearchParams = (filters) => {
@@ -155,6 +160,9 @@ export function useFilters() {
                 }
             }
         }
+        if(params.mode == "vibe"){
+            delete params.page
+        }
 
         // if (filters.sort_by) {
         //     params.set("sort", `${filters.sort_by}:${filters.sort_order}`);
@@ -177,11 +185,19 @@ export function useFilters() {
                 // Parse Range: ensure it returns [string, string]
                 else if (config.type === "range") {
                     const parts = paramValue.split(",");
-                    filters[key] = [parts[0] || "", parts[1] || ""];
+                    filters[key] = parts.map((val) => {
+                        if (val === "undefined" || val==null) return null;
+                        // Convert to number if value exists
+                        return Number(val);
+                    });
                 }
                 // Parse Select: single string
                 else if (config.type === "select" || config.type === "value") {
-                    filters[key] = paramValue;
+                    if(key=="page"){
+                        filters[key] = Number(paramValue);
+                    } else{
+                        filters[key] = paramValue;
+                    }
                 }
             }
         }
@@ -195,8 +211,17 @@ export function useFilters() {
 
             const type = FILTER_CONFIG[key].type
             const val = filters[key]
+
+            if(key === "page"){
+                const page_number = Number(val)
+                if(page_number>1){
+                    const items_per_page = 20
+                    res.offset = (page_number-1) * items_per_page
+                    res.limit = items_per_page
+                }
+            }
             
-            if(type == "multiselect"){
+            else if(type == "multiselect"){
                 if(val?.length>0){
                     res[key] = val
                 }
@@ -208,10 +233,12 @@ export function useFilters() {
                 if(lte){rangeVal.lte = lte}
                 res[key] = rangeVal;
             }
-            else if(type=="select"){
+            else if(type=="select" && val && val!==""){
                 res[key] = val
             }
+
         }
+
         return res;
     }
 

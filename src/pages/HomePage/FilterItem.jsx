@@ -30,7 +30,7 @@ const FilterItem = memo(({config, value, onChange, filterKey, className=""}) => 
             <Component
                 label={label} 
                 // options={config.options} 
-                value={value}
+                value={[value[0]==null?config.minValue:value[0], value[1]==null?config.maxValue:value[1]]}
                 onChange={(val)=>onChange(filterKey, val)}
                 // setSelected={(val)=>onChange(filterKey, val)}
                 className={className}

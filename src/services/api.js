@@ -20,15 +20,25 @@ function clean(filters) {
 }
 
 export async function classicSearch(query = null, filters = {}) {
-    const body = clean({ ...filters, query });
-    const { data } = await client.post("/search", body);
-    return data;
+    try{
+        const body = clean({ ...filters, query });
+        const { data } = await client.post("/search", body);
+        return data;
+    } catch (error) {
+        console.error("[classicSearch] API error:", error);
+        throw error;
+    }
 }
 
 export async function vibeSearch(query, filters = {}) {
-    const body = clean({ ...filters, query });
-    const { data } = await client.post("/search/semantic", body);
-    return data;
+    try{
+        const body = clean({ ...filters, query });
+        const { data } = await client.post("/search/semantic", body);
+        return data;
+    } catch (error) {
+        console.error("[vibeSearch] API error:", error);
+        throw error;
+    }
 }
 
 export async function getSimilarTitles(slug, filters = {}) {

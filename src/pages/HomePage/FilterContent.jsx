@@ -2,22 +2,23 @@ import { useState, useEffect, useCallback } from "react"
 import { Drawer, Button, Surface, Accordion } from "@heroui/react";
 import { useFilters, DEFAULT_FILTERS } from "../../hooks/useFilters"
 import FilterItem from "./FilterItem"
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon, TrashIcon } from 'lucide-react'
 
 
-export default function FilterPanel({ handleApply, appliedFilters, filterConfig, variant = "desktop", className = "", isOpen, onOpenChange }) {
+export default function FilterPanel({ handleApply, resetFilters, appliedFilters, filterConfig, variant = "desktop", className = "", isOpen, onOpenChange }) {
     // actual applied filters
     // const { filters, filterConfig } = useFilters()
 
     // dirty filters, storing current user selection, NOT the applied filter. 
     // This gets coppied to applied filters on clicking apply
-    const [dirtyFilters, setDirtyFilters] = useState(() => { console.log(`Initializing ${variant} with filters:`, appliedFilters); return appliedFilters ?? DEFAULT_FILTERS })
+    const [dirtyFilters, setDirtyFilters] = useState(() => { console.log(`[FilterPanel] Initializing ${variant} variant with filters:`, appliedFilters); return appliedFilters ?? DEFAULT_FILTERS })
 
     // keep applied filters and dirty filters in sync
     // the applied filtes can change either from desktop filter panel
     // or mobile filter drawer, so to keep them in sync, this useEffect is used
     useEffect(() => {
-        console.log(`SYCNING DIRTY FILTERS ${variant}`, "applied filters: ", appliedFilters, "dirty: ", dirtyFilters)
+        // console.log(`[FilterPanel] SYCNING DIRTY FILTERS ${variant}`, "applied filters: ", appliedFilters, "dirty: ", dirtyFilters)
+        console.log(`[FilterPanel] SYCNING filters`)
         setDirtyFilters(appliedFilters)
     }, [appliedFilters])
 
@@ -56,10 +57,16 @@ export default function FilterPanel({ handleApply, appliedFilters, filterConfig,
                         )
                     })}
                 </Accordion>
-                <Button onClick={() => handleApply(dirtyFilters)}>
-                    <SearchIcon />
-                    Apply
-                </Button>
+                <div className="flex gap-3 justify-end items-center mt-4 pr-2">
+                    <Button onClick={resetFilters} variant="tertiary">
+                        <TrashIcon />
+                        Reset
+                    </Button>
+                    <Button onClick={() => handleApply(dirtyFilters)}>
+                        <SearchIcon />
+                        Apply
+                    </Button>
+                </div>
             </div>
         )
     }
@@ -90,12 +97,12 @@ function MobileFilterDrawer({ children, isOpen, onOpenChange, placement = "left"
             <Drawer.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
                 <Drawer.Content placement={placement}>
 
-                    <Drawer.Dialog className="">
+                    <Drawer.Dialog className="pr-1 pb-0">
                         <Drawer.CloseTrigger />
-                        <Drawer.Header>
+                        <Drawer.Header className="pb-2">
                             <Drawer.Heading>Filters</Drawer.Heading>
                         </Drawer.Header>
-                        <Drawer.Body >
+                        <Drawer.Body className="pb-6 pr-2">
                             {children}
                         </Drawer.Body>
                     </Drawer.Dialog>
