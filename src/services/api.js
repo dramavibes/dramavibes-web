@@ -20,13 +20,13 @@ function clean(filters) {
 }
 
 export async function classicSearch(query = null, filters = {}) {
-    const body = clean({ query, ...filters });
+    const body = clean({ ...filters, query });
     const { data } = await client.post("/search", body);
     return data;
 }
 
 export async function vibeSearch(query, filters = {}) {
-    const body = clean({ query, ...filters });
+    const body = clean({ ...filters, query });
     const { data } = await client.post("/search/semantic", body);
     return data;
 }

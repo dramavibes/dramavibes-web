@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     TextField,
     InputGroup,
@@ -8,8 +8,12 @@ import {
 import {SearchIcon} from 'lucide-react'
 
 
-export default function SearchBar({ placeholder, onSubmit, isInvalid, errorMsg }) {
-    const [value, setValue] = useState("")
+export default function SearchBar({ placeholder, onSubmit, isInvalid, errorMsg, defaultValue="" }) {
+    const [value, setValue] = useState(defaultValue)
+
+    useEffect(()=>{
+        setValue(defaultValue)
+    }, [defaultValue])
 
     return (
         <TextField aria-label="search" className="w-full max-w-xl" isInvalid={isInvalid}>
