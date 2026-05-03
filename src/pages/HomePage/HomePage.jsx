@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useState, useRef, use } from "react"
 import { useSearchParams } from "react-router";
-import { Separator, Button, Surface, Spinner } from "@heroui/react";
+import { Separator, Button, Surface, Spinner, Chip } from "@heroui/react";
 import { Filter as FilterIcon } from "lucide-react";
 
 import { useFilters } from "../../hooks/useFilters"
@@ -29,7 +29,7 @@ export default function HomePage() {
     const [response, setResponse] = useState({})
     const [loading, setLoading] = useState(false)
 
-    const { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery } = useFilters()
+    const { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, filtersToChips } = useFilters()
     const [isFilterPanelOpen, setFilterPanelOpen] = useState(false)
 
     useEffect(()=>{if(isLargeScreen){setFilterPanelOpen(true)}}, [isLargeScreen])
@@ -206,7 +206,7 @@ export default function HomePage() {
             <div className={`grow
                grid 
                ${!isLargeScreen? 'grid-cols-1': isFilterPanelOpen?'grid-cols-[320px_1fr]':'grid-cols-[0px_1fr]'}
-               transition-all duration-300
+               transition-all duration-300 p-3
             `}>
                 {/* ----------------------- Filter Panel ------------------------------- */}
                 <FilterPanel
@@ -224,7 +224,9 @@ export default function HomePage() {
                             <FilterIcon />
                             Filters
                         </Button>
-                        <div className="grow"></div>
+                        <div className="grow flex flex-wrap items-center gap-3">
+                            {/* {filtersToChips(appliedFilters).map((val, idx) => <Chip key={idx}>{val}</Chip>)} */}
+                        </div>
                     </div>
                     {/* <pre className="text-xs p-5 h-20 overflow-y-auto border-2 border-border">
                         {JSON.stringify(appliedFilters, null, 2)}

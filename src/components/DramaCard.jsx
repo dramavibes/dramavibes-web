@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { Star } from "lucide-react";
 import { VibeBadge, ToneBadge, MatchScoreBadge } from "./TagBadge";
 import { Card } from "@heroui/react";
+import { getMediumSizeImage } from "../utils";
 
 export default function DramaCard({ drama, showEnding=false }) {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function DramaCard({ drama, showEnding=false }) {
         slug,
         title,
         type,
+        episodes,
         country,
         year,
         rating,
@@ -23,22 +25,6 @@ export default function DramaCard({ drama, showEnding=false }) {
         recommendation_score,
     } = drama;
 
-    const get_medium_image = (url) => {
-        if (url) {
-            const lastIndex = url.lastIndexOf('.')
-            if (lastIndex > 0) {
-                // split by '.'
-                let firstPart = url.substring(0, lastIndex);
-                const secondPart = url.substring(lastIndex);
-                const lastChar = firstPart.slice(-1);
-                if (lastChar == "s") {
-                    const result = firstPart.slice(0, -1) + 'c' + secondPart;   // gives medium sized image
-                    return result;
-                }
-            }
-        }
-        return url;
-    }
 
     return (
         <Card
@@ -56,7 +42,7 @@ export default function DramaCard({ drama, showEnding=false }) {
         {/* -- Poster -------------------------------------------------------- */}
         <div className="relative w-full aspect-5/6 overflow-hidden">
             <img
-                src={get_medium_image(image_url)}
+                src={getMediumSizeImage(image_url)}
                 alt={title}
                 loading="lazy"
                 className="
@@ -91,6 +77,7 @@ export default function DramaCard({ drama, showEnding=false }) {
                     "
                 >
                     {type}
+                    {episodes && ` | ${episodes} ep`}
                 </span>
             )}
         </div>

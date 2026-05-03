@@ -42,18 +42,33 @@ export async function vibeSearch(query, filters = {}) {
 }
 
 export async function getSimilarTitles(slug, filters = {}) {
-    const body = clean({ ...filters });
-    const { data } = await client.post(`/similar/${slug}`, body);
-    return data;
+    try{
+        const body = clean({ ...filters });
+        const { data } = await client.post(`/similar/${slug}`, body);
+        return data;
+    } catch (error) {
+        console.error("[getSimilarTitles] API error:", error);
+        throw error;
+    }
 }
 
-export async function getDramaBySlug(slug) {
-    const { data } = await client.get(`/details/${slug}`);
-    return data;
+export async function getDetailsBySlug(slug) {
+    try{
+        const { data } = await client.get(`/details/${slug}`);
+        return data;
+    } catch (error) {
+        console.error("[getDetailsBySlug] API error:", error);
+        throw error;
+    }
 }
 
 
 export async function getFilterOptions() {
-    const { data } = await client.get("/filters");
-    return data;
+    try{
+        const { data } = await client.get("/filters");
+        return data;
+    } catch (error) {
+        console.error("[getFilterOptions] API error:", error);
+        throw error;
+    }
 }

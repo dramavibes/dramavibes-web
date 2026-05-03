@@ -242,6 +242,41 @@ export function useFilters() {
         return res;
     }
 
-    return { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery };
+    const filtersToChips = (filters) => {
+        let chips = [];
+        for(const key in appliedFilters){
+            const type = FILTER_CONFIG[key]?.type
+            if(type === "multiselect"){
+                appliedFilters[key].forEach(v => chips.push(`${key}:${v}`))
+            }
+            // else if(type === "select"){
+            //     if(appliedFilters[key]){
+            //         chips.push(appliedFilters[key])
+            //     }
+            // }
+            else if(type === "range"){
+                if(appliedFilters[key]){
+                    const [gte, lte] = appliedFilters[key]
+                    if(lte!=null && gte!=null){
+                        chips.push(`${gte} <= ${key} <= ${lte}`)
+                    }
+                    else if(lte!=null){
+                        chips.push(`${key} <= ${lte}`)
+                    }
+                    else if(gte!=null){
+                        chips.push(`${key} >= ${gte}`)
+                    }
+                }
+            }
+
+            if(appliedFilters.sort_by){
+                chips.push(`${appliedFilters.sort_by}:${appliedFilters.sort_order?appliedFilters.sort_order:"asc"}`)
+            }
+        }
+
+        return chips;
+    }
+
+    return { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, filtersToChips };
 
 }
