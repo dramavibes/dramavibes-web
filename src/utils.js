@@ -16,5 +16,7 @@ export const getMediumSizeImage = (url) => {
 }
 
 export const truncate = (str, len) => {
+    if(!str) return null;
+    
     return str.length > len ? str.slice(0, len) + "..." : str;
 };

@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react'
-import {useNavigate} from 'react-router'
+import {useNavigate, Link} from 'react-router'
 import {Moon, Sun} from 'lucide-react'
 import {useTheme} from '../hooks/useTheme'
 
@@ -12,15 +12,17 @@ export default function Navbar(){
         <nav className="
             bg-background flex justify-around items-center
             pt-5 pb-3 px-5 h-[68px]
-        ">
+        ">  
             <h1 
-                onClick={()=>navigate("/")} 
+                // onClick={()=>navigate("/")} 
                 className="
                 text-2xl font-semibold text-foreground grow
                 ml-5
                 "
             >
+                <Link to="/">      
                 DramaVibes
+                </Link>
             </h1>
             <Button 
                 isIconOnly 

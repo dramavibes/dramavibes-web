@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { getDetailsBySlug, getSimilarTitles } from "../services/api";
 import { VibeBadge, ToneBadge, BaseTagBadge } from "../components/TagBadge";
+import DramaCard from "../components/DramaCard"
 
 import { getMediumSizeImage, truncate } from "../utils";
 
@@ -293,18 +294,34 @@ export default function DetailPage() {
     const { slug } = useParams();
     const navigate = useNavigate();
     const [data, setData] = useState(null);
+    const [simlarTitles, setSimilarTitles] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [spoilerOpen, setSpoilerOpen] = useState(false);
 
     useEffect(() => {
         if (!slug) return;
-        setLoading(true);
-        setError(null);
-        getDetailsBySlug(slug)
-            .then(setData)
-            .catch(() => setError("Couldn't load details. Please try again."))
-            .finally(() => setLoading(false));
+
+        const loadDetails = async () => {
+            setLoading(true)
+            setError(null)
+            try{
+                const _data = await getDetailsBySlug(slug)
+                setData(_data)
+
+                const _res = await getSimilarTitles(slug)
+                setSimilarTitles(_res?.results)
+
+
+            } catch (error) {
+                console.error("[Details Page]", error)
+                setError("Couldn't load details. Please try again.")
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadDetails();
     }, [slug]);
 
     if (loading) {
@@ -477,10 +494,10 @@ export default function DetailPage() {
             <Separator className="mb-5" />
 
             {/* -- Body ----------------------------------------------------------- */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 mb-2">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 mb-2 w-full">
 
                 {/* Left column */}
-                <div className="flex flex-col gap-9 bg-surface rounded-xl p-4">
+                <div className="flex flex-col gap-9 bg-surface rounded-xl p-4 min-w-0">
 
                     {/* Genres + Tags */}
                     {(genres.length > 0 || tags.length > 0) && (
@@ -513,7 +530,7 @@ export default function DetailPage() {
                     )}
 
                     
-
+                    {/* AI Content */}
                     <section className="rounded-2xl border border-default bg-default-soft p-4">
                         <div className="flex gap-2 ">
                             <SparklesIcon size={20} />
@@ -580,9 +597,6 @@ export default function DetailPage() {
                             )}
 
 
-
-
-
                             {/* Ending details (spoiler) */}
                             {data.ending_details && (
                                 <section>
@@ -594,13 +608,27 @@ export default function DetailPage() {
                                     </Spoiler>
                                 </section>
                             )}
+
+                            {/* Similar Titles */}
+                            <section>
+                                <SectionHeading>Similar</SectionHeading>
+                                <div className="
+                                    flex gap-4 w-full overflow-auto p-4 justify-stretch bg-background rounded-xl border border-border
+                                    snap-x snap-mandatory scroll-px-3.5
+                                ">
+                                    {simlarTitles.map(drama => (
+                                        <DramaCard key={drama.slug} drama={drama} className="w-[200px] shrink-0 snap-start"/>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
                     </section>
 
                     {/* Synopsis */}
+                    {data.synopsis && 
                     <section>
                         <SectionHeading>Synopsis</SectionHeading>
-                        <p className="text-sm text-foreground/80 leading-relaxed">{truncate(data.synopsis, 500)}</p>
+                        <p className="text-sm text-foreground/80 leading-relaxed">{truncate(data.synopsis, Math.max(10, data.synopsis.length-10))}</p>
                         <a
                             href={mdlUrl}
                             target="_blank"
@@ -611,6 +639,9 @@ export default function DetailPage() {
                             Full synopsis on MyDramaList
                         </a>
                     </section>
+                    }
+
+                    
 
                 </div>
 

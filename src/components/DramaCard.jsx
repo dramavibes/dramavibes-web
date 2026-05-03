@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Star } from "lucide-react";
 import { VibeBadge, ToneBadge, MatchScoreBadge } from "./TagBadge";
 import { Card } from "@heroui/react";
 import { getMediumSizeImage } from "../utils";
 
-export default function DramaCard({ drama, showEnding=false }) {
+export default function DramaCard({ drama, showEnding=false, className="" }) {
     const navigate = useNavigate();
 
     const {
@@ -27,9 +27,10 @@ export default function DramaCard({ drama, showEnding=false }) {
 
 
     return (
+        // <Link to={`/title/${slug}`}>
         <Card
-            onClick={() => navigate(`/title/${slug}`)}
-            className="
+            // onClick={() => navigate(`/title/${slug}`)}
+            className={`
                 p-0 gap-0
                 group relative flex flex-col rounded-xl overflow-hidden
                 bg-surface border border-border dark:border-accent/10
@@ -37,7 +38,9 @@ export default function DramaCard({ drama, showEnding=false }) {
                 transition-transform duration-200 ease-out
                 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20
                 dark:hover:shadow-xl dark:hover:shadow-accent/20
-            "
+                ${className}
+            `}
+            render={(props)=><Link {...props} to={`/title/${slug}`}/>}
         >
         {/* -- Poster -------------------------------------------------------- */}
         <div className="relative w-full aspect-5/6 overflow-hidden">
@@ -133,6 +136,7 @@ export default function DramaCard({ drama, showEnding=false }) {
             )}
         </Card.Content>
         </Card>
+        // </Link>
     );
 }
 
