@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router";
 import NavbarLayout from './pages/NavbarLayout';
 import HomePage from './pages/HomePage/HomePage'
 import DetailPage from './pages/DetailPage'
+import NotFound from './pages/NotFound';
 import { useWakeUp } from "./hooks/useWakeUp"
 
 
@@ -28,6 +29,7 @@ function App() {
                 <Route element={<NavbarLayout />}>
                     <Route index element={isBackendReady ? <HomePage /> : <WakingUpBanner isWakingUp={isWakingUp} />} />
                     <Route path="title/:slug" element={<DetailPage />} />
+                    <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
             <ReactQueryDevtools initialIsOpen={false} />
