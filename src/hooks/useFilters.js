@@ -131,7 +131,11 @@ export function useFilters() {
         setAppliedFilters(prev => ({ ...prev, [key]: value }));
     };
 
-    const resetFilters = () => setAppliedFilters({...DEFAULT_FILTERS, query: appliedFilters.query});
+    const resetFilters = () => {
+        const f = {...DEFAULT_FILTERS, query: appliedFilters.query, mode: appliedFilters.mode};
+        setAppliedFilters(f);
+        return f;
+    };
 
 
     const buildSearchParams = (filters) => {
@@ -228,10 +232,12 @@ export function useFilters() {
             }
             else if(type=="range"){
                 const [gte, lte] = val
-                let rangeVal = {}
-                if(gte){rangeVal.gte = gte}
-                if(lte){rangeVal.lte = lte}
-                res[key] = rangeVal;
+                if(gte!=null || lte!=null){
+                    let rangeVal = {}
+                    if(gte){rangeVal.gte = gte}
+                    if(lte){rangeVal.lte = lte}
+                    res[key] = rangeVal;
+                }
             }
             else if(type=="select" && val && val!==""){
                 res[key] = val
@@ -242,12 +248,30 @@ export function useFilters() {
         return res;
     }
 
+    const isNum = (n) => !(n==null || isNaN(n))
+
+    const getFilterCounts = () => {
+        return Object.entries(appliedFilters).map(([key, val]) => {
+            if(key=="sort_by" || key=="sort_order") return;
+            const type = FILTER_CONFIG[key]?.type
+            if(type === "multiselect" && val?.length > 0){
+                return {name: key, count: val?.length}
+            }
+            else if(type === "range" && (isNum(val[0]) || isNum(val[1]))){
+                return {name: key, count: 1}
+            }
+            else if(type === "select" && val){
+                return {name: key, count: 1}
+            }
+        }).filter(val => {if(val) return val})
+    }
+
     const filtersToChips = (filters) => {
         let chips = [];
         for(const key in appliedFilters){
             const type = FILTER_CONFIG[key]?.type
             if(type === "multiselect"){
-                appliedFilters[key].forEach(v => chips.push(`${key}:${v}`))
+                appliedFilters[key].forEach(v => chips.push(`${v}${key=="romance_level"? " Romance":""}`))
             }
             // else if(type === "select"){
             //     if(appliedFilters[key]){
@@ -257,13 +281,13 @@ export function useFilters() {
             else if(type === "range"){
                 if(appliedFilters[key]){
                     const [gte, lte] = appliedFilters[key]
-                    if(lte!=null && gte!=null){
+                    if(isNum(lte) && isNum(gte)){
                         chips.push(`${gte} <= ${key} <= ${lte}`)
                     }
-                    else if(lte!=null){
+                    else if(isNum(lte)){
                         chips.push(`${key} <= ${lte}`)
                     }
-                    else if(gte!=null){
+                    else if(isNum(gte)){
                         chips.push(`${key} >= ${gte}`)
                     }
                 }
@@ -277,6 +301,6 @@ export function useFilters() {
         return chips;
     }
 
-    return { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, filtersToChips };
+    return { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, getFilterCounts };
 
 }

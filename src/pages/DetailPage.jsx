@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { useQuery } from '@tanstack/react-query'
 import { Spinner, Chip, Separator, Button, Link } from "@heroui/react";
 import {
     ArrowLeft,
@@ -15,7 +16,8 @@ import {
     Film,
     Play, 
     MonitorPlay, 
-    SparklesIcon
+    SparklesIcon,
+    TriangleAlertIcon
 } from "lucide-react";
 import { getDetailsBySlug, getSimilarTitles } from "../services/api";
 import { VibeBadge, ToneBadge, BaseTagBadge } from "../components/TagBadge";
@@ -188,8 +190,8 @@ function StatPill({ icon: Icon, label, value }) {
     if (value == null || value === "") return null;
     return (
         <div className="flex items-center gap-1.5 text-sm text-default-foreground/80">
-            <Icon size={14} className="text-foreground/50 shrink-0" />
-            <span className="text-foreground/50 text-xs">{label}</span>
+            <Icon size={14} className="text-foreground/60 shrink-0" />
+            <span className="text-foreground/60 text-xs">{label}</span>
             <span className="font-medium text-foreground/80">{value}</span>
         </div>
     );
@@ -253,9 +255,10 @@ function Spoiler({ children, warningText="Reveal Spoiler!" }) {
             onClick={() => setOpen(true)}
             variant="outline"
             size="sm"
-            className="text-xs text-muted h-6"
+            className="text-xs h-6 bg-warning-soft hover:bg-warning-soft-hover text-amber-600 dark:text-warning border border-warning"
             // className="text-xs text-muted border border-default px-2 py-1 rounded-md cursor-pointer"
         >
+            <TriangleAlertIcon/>
             {warningText}
         </Button>
     );
@@ -293,36 +296,22 @@ function CastInitials({ name }) {
 export default function DetailPage() {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const [data, setData] = useState(null);
-    const [simlarTitles, setSimilarTitles] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [spoilerOpen, setSpoilerOpen] = useState(false);
 
-    useEffect(() => {
-        if (!slug) return;
+    const {data, isLoading: loading, error} = useQuery({
+        queryKey: ['details', slug],
+        queryFn: () => getDetailsBySlug(slug),
+        enabled: !!slug,
+        staleTime: Infinity,
+    })
 
-        const loadDetails = async () => {
-            setLoading(true)
-            setError(null)
-            try{
-                const _data = await getDetailsBySlug(slug)
-                setData(_data)
+    const {data: similarData, isLoading: similarTitlesLoading, error: similarTitlesError} = useQuery({
+        queryKey: ['similar', slug],
+        queryFn: () => getSimilarTitles(slug),
+        enabled: !!slug,
+        staleTime: Infinity,
+    })
+    const similarTitles = similarData?.results
 
-                const _res = await getSimilarTitles(slug)
-                setSimilarTitles(_res?.results)
-
-
-            } catch (error) {
-                console.error("[Details Page]", error)
-                setError("Couldn't load details. Please try again.")
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        loadDetails();
-    }, [slug]);
 
     if (loading) {
         return (
@@ -377,7 +366,7 @@ export default function DetailPage() {
                 className="flex items-center gap-1.5 text-sm text-foreground/80 hover:text-foreground/90 transition-colors mb-8 group cursor-pointer"
             >
                 <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
-                Back to results
+                Back
             </button>
 
             {/* -- Hero ----------------------------------------------------------- */}
@@ -421,10 +410,10 @@ export default function DetailPage() {
                             {data.title}
                         </h1>
                         {data.native_title && (
-                            <p className="text-foreground/50 text-base mt-1">{data.native_title}</p>
+                            <p className="text-foreground/70 text-base mt-1">{data.native_title}</p>
                         )}
                         {alsoKnownAs.length > 0 && (
-                            <p className="text-foreground/50 text-xs mt-1">
+                            <p className="text-foreground/70 text-xs mt-1">
                                 Also known as: {alsoKnownAs.join(", ")}
                             </p>
                         )}
@@ -437,7 +426,7 @@ export default function DetailPage() {
                                 <Star size={16} className="text-amber-400 fill-amber-400" />
                                 <span className="text-xl font-bold text-foreground">{data.rating}</span>
                                 {data.scored_by_user_count && (
-                                    <span className="text-xs text-foreground/50">
+                                    <span className="text-xs text-foreground/80">
                                         ({formatNumber(data.scored_by_user_count)} ratings)
                                     </span>
                                 )}
@@ -465,11 +454,11 @@ export default function DetailPage() {
 
                     {data.ranking != null && (
                         <div className="flex items-center gap-4 mt-0.5">
-                            <div className="flex items-center gap-1 text-xs text-foreground/50">
+                            <div className="flex items-center gap-1 text-xs text-foreground/80">
                                 <Trophy size={12} className="text-amber-400" />
                                 Rank #{data.ranking}
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-foreground/50">
+                            <div className="flex items-center gap-1 text-xs text-foreground/80">
                                 <TrendingUp size={12} className="text-sky-400" />
                                 Popularity #{data.popularity}
                             </div>
@@ -612,14 +601,27 @@ export default function DetailPage() {
                             {/* Similar Titles */}
                             <section>
                                 <SectionHeading>Similar</SectionHeading>
-                                <div className="
-                                    flex gap-4 w-full overflow-auto p-4 justify-stretch bg-background rounded-xl border border-border
-                                    snap-x snap-mandatory scroll-px-3.5
-                                ">
-                                    {simlarTitles.map(drama => (
-                                        <DramaCard key={drama.slug} drama={drama} className="w-[200px] shrink-0 snap-start"/>
-                                    ))}
-                                </div>
+                                {similarTitlesLoading && 
+                                    <div className="flex items-center justify-center min-h-[50px]">
+                                        <Spinner size="lg" />
+                                    </div>
+                                }
+                                {similarTitlesError && 
+                                    <div className="flex items-center justify-center min-h-[50px] text-muted text-xs">
+                                        <p>Something went wrong!</p>
+                                    </div>
+                                }
+                                {!similarTitlesLoading && !similarTitlesError &&
+                                    <div className="
+                                        flex gap-4 w-full overflow-auto p-4 justify-stretch bg-background rounded-xl border border-border
+                                        snap-x snap-mandatory scroll-px-3.5
+                                    ">
+                                        
+                                        {similarTitles?.map(drama => (
+                                            <DramaCard key={drama.slug} drama={drama} className="w-[200px] shrink-0 snap-start"/>
+                                        ))}
+                                    </div>
+                                }
                             </section>
                         </div>
                     </section>

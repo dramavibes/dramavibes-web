@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from "react"
 import { Drawer, Button, Surface, Accordion } from "@heroui/react";
 import { useFilters, DEFAULT_FILTERS } from "../../hooks/useFilters"
 import FilterItem from "./FilterItem"
-import { SearchIcon, TrashIcon } from 'lucide-react'
+import { InfoIcon, SearchIcon, TrashIcon } from 'lucide-react'
 
 
-export default function FilterPanel({ handleApply, resetFilters, appliedFilters, filterConfig, variant = "desktop", className = "", isOpen, onOpenChange }) {
+export default function FilterPanel({ handleApply, resetFilters, appliedFilters, filterConfig, variant = "desktop", className = "", isOpen, onOpenChange, searchMode}) {
     // actual applied filters
     // const { filters, filterConfig } = useFilters()
 
@@ -34,15 +34,22 @@ export default function FilterPanel({ handleApply, resetFilters, appliedFilters,
                 <Accordion allowsMultipleExpanded className="w-full max-w-md">
                     {Object.entries(filterConfig || {}).map(([key, config]) => {
                         if (config.component == null) return null;
+
+                        const isDisabled = (searchMode==="vibe" && ['sort_by', 'sort_order'].includes(key))
                         return (
-                            <Accordion.Item key={key} defaultExpanded={key != "genres"}>
+                            <Accordion.Item key={key} defaultExpanded={key != "genres"} isDisabled={isDisabled}>
                                 <Accordion.Heading>
                                     <Accordion.Trigger className="capitalize text-foreground">
-                                        {key?.replace("_", " ")}
-                                        <Accordion.Indicator />
+                                        {key?.replace("_", " ")} 
+                                        {isDisabled &&
+                                            <div className="text-[10px] text-muted font-normal tracking-tighter flex items-center gap-1 ml-auto">
+                                            <InfoIcon size={10}/> Not available in Vibe mode
+                                            </div>
+                                        }
+                                        <Accordion.Indicator className={isDisabled?"ml-2":""}/>
                                     </Accordion.Trigger>
                                 </Accordion.Heading>
-                                <Accordion.Panel>
+                                <Accordion.Panel className={isDisabled?"pointer-events-none":""}>
                                     <Accordion.Body className="pt-2">
                                         <FilterItem
                                             filterKey={key}

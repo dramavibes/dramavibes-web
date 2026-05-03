@@ -84,3 +84,14 @@
   --warning: oklch(82.03% 0.1388 81.04);
   --warning-foreground: oklch(21.03% 0.0059 81.04);
 }
+
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+}

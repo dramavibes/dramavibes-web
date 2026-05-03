@@ -1,7 +1,8 @@
 import { memo, useCallback, useEffect, useMemo, useState, useRef, use } from "react"
 import { useSearchParams } from "react-router";
-import { Separator, Button, Surface, Spinner, Chip } from "@heroui/react";
-import { Filter as FilterIcon } from "lucide-react";
+import { useQuery } from '@tanstack/react-query'
+import { Separator, Button, Surface, Spinner, Chip, Badge, CloseIcon } from "@heroui/react";
+import { Filter as FilterIcon, TrashIcon } from "lucide-react";
 
 import { useFilters } from "../../hooks/useFilters"
 import { useIsLargeScreen } from "../../hooks/useIsLargeScreen"
@@ -24,22 +25,44 @@ export default function HomePage() {
 
     // const [searchQuery, setSearchQuery] = useState("")
     const [searchMode, setSearchMode] = useState("vibe")
-
     const [searchError, setSearchError] = useState("")
-    const [response, setResponse] = useState({})
-    const [loading, setLoading] = useState(false)
 
-    const { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, filtersToChips } = useFilters()
+    // const [response, setResponse] = useState({})
+    // const [loading, setLoading] = useState(false)
+
+    const { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, getFilterCounts } = useFilters()
     const [isFilterPanelOpen, setFilterPanelOpen] = useState(false)
+    const filterCounts = getFilterCounts();
 
     useEffect(()=>{if(isLargeScreen){setFilterPanelOpen(true)}}, [isLargeScreen])
+    
 
     
+    // ---------------------- TanStack UseQuery ----------------------------------
+    // Search flow: 
+    // user searches -> handleSearchSubmit - sets searchParams (url) -> useEffect fires - sets Applied filters -> useQuery key changes - search triggers
+    // similary when user applies filter -> handleFilterApply - sets searchparams -> useEffect fires - sets Applied filters -> useQuery key changes - search triggers
+    const params = Object.fromEntries(searchParams)
+    const hasParams = Object.keys(params).length > 0
+    // const filters = parseParamsToFilters(params)
+    const filters = appliedFilters
+    const builtQuery = buildQuery(filters)
+
+    const {data: response, isFetching: loading} = useQuery({
+        queryKey: ['search', filters.mode, filters.query, builtQuery],
+        queryFn: () => filters.mode === 'classic'? 
+                        classicSearch(filters.query, builtQuery) 
+                        : filters.query?vibeSearch(filters.query, builtQuery):null,
+
+        enabled: hasParams && !searchError,   // only runs when there's something to search
+        staleTime: Infinity,
+    })
+
+    // ---------------------------------------------------------------------------
     // URL params is the one source of truth for filter state
-    // any change in url params will update filter state and trigger search
+    // any change in url params will update filter state and that will trigger search
     // if the url has search params even on first load (opening a shared url with params) it will trigger search
     useEffect(() => {
-        // const params = Object.fromEntries([...searchParams])
         const params = Object.fromEntries(searchParams)
         console.log("[Home UseEffect] Search params:", params)
 
@@ -50,45 +73,8 @@ export default function HomePage() {
         // sync UI controls
         setSearchMode(parsedFilters.mode || "vibe")
 
-        // trigger search
-        if(Object.keys(params).length !== 0){
-            validateAndSearch(parsedFilters)
-        }
     }, [searchParams])
 
-
-    const validateAndSearch = (filters) => {
-        console.log("[validateAndSearch]", filters)
-        
-        // scrollSearchBarIntoView()
-        
-        const query = filters.query?.trim()
-
-        if (filters.mode === "vibe") {
-            if (!(query?.length >= 3)) {
-                setSearchError("Query must be at least 3 characters!")
-                return false
-            }
-        }
-
-        setSearchError("")
-        performSearch(filters)
-        return true
-    }
-
-    
-    const performSearch = async (filters) => {
-        console.log("[performSearch]", `mode: ${filters.mode} query: ${filters.query} page: ${filters.page}`, filters)
-        const query = filters.query
-        const mode = filters.mode
-        
-        if(mode == "classic"){
-            handleClassicSearch(query, buildQuery(filters))
-        }
-        else if(mode == "vibe"){
-            handleVibeSearch(query, buildQuery(filters))
-        }
-    }
 
     const handleClassicSearch = async (query, filters) => {
         setLoading(true)
@@ -118,19 +104,17 @@ export default function HomePage() {
 
         query = query.trim()
         
+        // validation BEFORE updating URL (important UX detail)
+        if (searchMode === "vibe" && query.length < 3) {
+            setSearchError("Query must be at least 3 characters!")
+            return
+        }
+
         const newFilters = {
             ...appliedFilters,
             query,
             mode: searchMode,
             page: 1,
-        }
-
-        
-
-        // validation BEFORE updating URL (important UX detail)
-        if (newFilters.mode === "vibe" && query.length < 3) {
-            setSearchError("Query must be at least 3 characters!")
-            return
         }
 
         setSearchError("")
@@ -151,10 +135,15 @@ export default function HomePage() {
             mode: searchMode
         }
         const params = buildSearchParams(newFilters)
-        setSearchParams(params)                // <-- search param drives everything, change in search params will update applied filtters and trigger search
-        // setAppliedFilters(dirtyFilters)     // This is commented as setAppliedFilters will be called whenever searchparams change using useEffect
+        setSearchParams(params)                // <-- search param drives everything, change in search params will update applied filters and trigger search
 
         if(!isLargeScreen){setFilterPanelOpen(false)}   // close filter panel
+    }
+
+    const handleResetFilters = () => {
+        const f = resetFilters()
+        const params = buildSearchParams(f)    
+        setSearchParams(params)         // <-- search param drives everything, change in search params will update applied filters and trigger search
     }
 
     const handlePageChange = (page) => {
@@ -167,13 +156,13 @@ export default function HomePage() {
         setSearchParams(params)
     }
 
-    const scrollSearchBarIntoView = () => {
-        // scrollIntoView moves the viewport to the element
-        searchBarRef.current?.scrollIntoView({
-            behavior: 'smooth', // Animates the scroll
-            block: 'start',     // Aligns element to the top of the viewport
-        });
-    };
+    // const scrollSearchBarIntoView = () => {
+    //     // scrollIntoView moves the viewport to the element
+    //     searchBarRef.current?.scrollIntoView({
+    //         behavior: 'smooth', // Animates the scroll
+    //         block: 'start',     // Aligns element to the top of the viewport
+    //     });
+    // };
 
     return (
         <div className="flex flex-col">
@@ -210,22 +199,26 @@ export default function HomePage() {
             `}>
                 {/* ----------------------- Filter Panel ------------------------------- */}
                 <FilterPanel
-                    handleApply={handleFilterApply} resetFilters={resetFilters} appliedFilters={appliedFilters} filterConfig={filterConfig} 
+                    handleApply={handleFilterApply} resetFilters={handleResetFilters} appliedFilters={appliedFilters} filterConfig={filterConfig} 
                     variant={isLargeScreen?'desktop':'mobile'}
                     isOpen={isFilterPanelOpen} onOpenChange={setFilterPanelOpen}
+                    searchMode={searchMode}
                 />
 
                 {/* ----------------------- Main section ------------------------------- */}
-                <div className="grow shrink-0">
+                <div className="grow shrink-0 min-w-0">
 
                     {/* -------- Top Filter Row --------- */}
-                    <div className="flex px-2 py-2">
-                        <Button onClick={() => setFilterPanelOpen(!isFilterPanelOpen)}>
+                    <div className="px-2 py-2 flex gap-4 items-center min-w-0">
+                        <Button onClick={() => setFilterPanelOpen(!isFilterPanelOpen)} size="sm">
                             <FilterIcon />
                             Filters
                         </Button>
-                        <div className="grow flex flex-wrap items-center gap-3">
-                            {/* {filtersToChips(appliedFilters).map((val, idx) => <Chip key={idx}>{val}</Chip>)} */}
+                        <div className="grow flex items-center gap-3 min-w-0 w-full overflow-x-auto no-scrollbar py-2">
+                            {filterCounts?.length>0 && <Chip className="capitalize border border-border cursor-pointer hover:bg-surface-secondary" onClick={handleResetFilters}><CloseIcon size={12}/>Clear All</Chip>}
+                            {filterCounts.map((val, idx) => (
+                                <FilterBadge key={val?.name} name={val?.name} count={val?.count}/>
+                            ))}
                         </div>
                     </div>
                     {/* <pre className="text-xs p-5 h-20 overflow-y-auto border-2 border-border">
@@ -267,5 +260,14 @@ function LoadingSpinner({size="lg"}) {
         <div className="flex justify-center items-center gap-4 p-1 mt-4">
             <Spinner size={size}/>
         </div>
+    )
+}
+
+function FilterBadge({name, count}){
+    return (
+        <Badge.Anchor>
+            <Chip className="capitalize border border-border">{name}</Chip>
+            <Badge size="sm" color="warning">{count}</Badge>
+        </Badge.Anchor>
     )
 }
