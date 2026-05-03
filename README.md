@@ -1,16 +1,51 @@
-# React + Vite
+# DramaVibes Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Find your next Asian drama by vibe, not just title.
 
-Currently, two official plugins are available:
+DramaVibes is a web app that helps users discover Asian dramas based on mood, tone, and emotional experience.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Check it out at: [https://dramavibes.netlify.app/](https://dramavibes.netlify.app/)
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Vibe-based semantic search
+- AI-powered summaries and classifications
+- Rich filtering (tone, pacing, romance level, emotional weight, etc.)
+- Detailed title pages with summaries and insights
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- TailwindCSS
+- HeroUI
+- TanStack Query (React Query)
+- Axios
+
+## Getting Started
+
+### Prerequisites
+- node
+- npm 
+
+### Installation
+
+```bash
+git clone https://github.com/dramavibes/dramavibes-web.git
+cd dramavibes-web
+npm install
+```
+
+### Run
+```bash
+npm run dev
+```
+
+### Backend
+
+This needs a backend, the URL for which needs to be added in a `.env` file.
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Find the repository for backend at: [https://github.com/dramavibes/dramavibes-api](https://github.com/dramavibes/dramavibes-api)
