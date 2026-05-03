@@ -15,9 +15,13 @@ export default function RangeSlider({minValue, maxValue, step=1, label, value, o
         >
             {/* <Label>Price Range</Label> */}
             {/* <Slider.Output /> */}
+
+            {/* Couldn't find the correct format to show numbers without comma seperator, so
+                Added custom JSX to show the seleccted range output    */}
             <div className="text-foreground font-semibold text-right">
                 {value?.[0]} - {value?.[1]}
             </div>
+
             <Slider.Track>
                 {({ state }) => (
                     <>

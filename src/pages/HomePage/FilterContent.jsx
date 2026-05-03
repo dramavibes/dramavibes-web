@@ -5,10 +5,18 @@ import FilterItem from "./FilterItem"
 import { InfoIcon, SearchIcon, TrashIcon } from 'lucide-react'
 
 
-export default function FilterPanel({ handleApply, resetFilters, appliedFilters, filterConfig, variant = "desktop", className = "", isOpen, onOpenChange, searchMode}) {
-    // actual applied filters
-    // const { filters, filterConfig } = useFilters()
-
+export default function FilterPanel({ 
+    handleApply, 
+    resetFilters, 
+    appliedFilters, 
+    filterConfig, 
+    isOpen, 
+    onOpenChange, 
+    searchMode,
+    variant = "desktop", 
+    className = "", 
+}) {
+    
     // dirty filters, storing current user selection, NOT the applied filter. 
     // This gets coppied to applied filters on clicking apply
     const [dirtyFilters, setDirtyFilters] = useState(() => { console.log(`[FilterPanel] Initializing ${variant} variant with filters:`, appliedFilters); return appliedFilters ?? DEFAULT_FILTERS })

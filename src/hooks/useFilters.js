@@ -3,7 +3,6 @@ import { getFilterOptions } from "../services/api"
 
 import MultiSelectTags from "../pages/HomePage/MultiselectTags"
 import MultiSelectCheckbox from "../pages/HomePage/MultiSelectCheckbox"
-import MultiSelectAutocomplete from "../pages/HomePage/MultiSelectAutocomplete"
 import RangeSlider from "../pages/HomePage/RangeSlider"
 import RangeInput from "../pages/HomePage/RangeInput"
 import SingleSelect from "../pages/HomePage/SingleSelect"

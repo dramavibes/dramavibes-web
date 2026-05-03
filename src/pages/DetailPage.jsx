@@ -151,14 +151,7 @@ const PLATFORM_CONFIG = {
     },
 };
 const getPlatformConfig = (platformName) => {
-    return (
-        PLATFORM_CONFIG[platformName] || {
-            color: "#6b7280",
-            bg: "#111827",
-            textColor: "#fff",
-            icon: <Play size={12} color="#9ca3af" />,
-        }
-    );
+    return PLATFORM_CONFIG[platformName] || {}
 };
 
 // --- Helpers ------------------------------------------------------------------
@@ -232,11 +225,11 @@ function PlatformButton({ platform, url }) {
             className={`
                 inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium
                 transition-all hover:scale-[1.03] active:scale-[0.98]
-                ${cfg.bg || "bg-amber-500/10 dark:bg-amber-500/20"}
+                ${cfg?.bg || "bg-amber-500/10 dark:bg-amber-500/20"}
                 text-foreground border border-default
             `}
         >
-            <MonitorPlay size={14} className={cfg.color || "text-amber-500"} />
+            <MonitorPlay size={14} className={cfg?.color || "text-amber-500"} />
             <span>{platform}</span>
             <ExternalLink size={12} className="text-muted" />
         </a>
@@ -465,7 +458,7 @@ export default function DetailPage() {
                         </div>
                     )}
 
-                    {/* MDL link — prominent */}
+                    {/* MDL link */}
                     <div className="mt-2">
                         <a
                             href={mdlUrl}
@@ -572,9 +565,6 @@ export default function DetailPage() {
                             {themes.length > 0 && (
                                 <section>
                                     <SectionHeading>Themes</SectionHeading>
-                                    {/* <p className="text-sm text-default-foreground/80 leading-relaxed capitalize">
-                                        {themes.join(" · ")}
-                                    </p> */}
                                     <div className="flex flex-wrap gap-1.5">
                                         {themes.map((t) => (
                                             <Chip key={t} size="sm" variant="flat" className="text-xs capitalize text-foreground/80">

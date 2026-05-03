@@ -23,12 +23,9 @@ export default function HomePage() {
 
     const [searchParams, setSearchParams] = useSearchParams()
 
-    // const [searchQuery, setSearchQuery] = useState("")
     const [searchMode, setSearchMode] = useState("vibe")
     const [searchError, setSearchError] = useState("")
 
-    // const [response, setResponse] = useState({})
-    // const [loading, setLoading] = useState(false)
 
     const { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, getFilterCounts } = useFilters()
     const [isFilterPanelOpen, setFilterPanelOpen] = useState(false)
@@ -36,7 +33,6 @@ export default function HomePage() {
 
     useEffect(()=>{if(isLargeScreen){setFilterPanelOpen(true)}}, [isLargeScreen])
     
-
     
     // ---------------------- TanStack UseQuery ----------------------------------
     // Search flow: 
@@ -156,13 +152,13 @@ export default function HomePage() {
         setSearchParams(params)
     }
 
-    // const scrollSearchBarIntoView = () => {
-    //     // scrollIntoView moves the viewport to the element
-    //     searchBarRef.current?.scrollIntoView({
-    //         behavior: 'smooth', // Animates the scroll
-    //         block: 'start',     // Aligns element to the top of the viewport
-    //     });
-    // };
+    const scrollSearchBarIntoView = () => {
+        // scrollIntoView moves the viewport to the element
+        searchBarRef.current?.scrollIntoView({
+            behavior: 'smooth', // Animates the scroll
+            block: 'start',     // Aligns element to the top of the viewport
+        });
+    };
 
     return (
         <div className="flex flex-col">

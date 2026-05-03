@@ -92,7 +92,7 @@ const CATEGORY_CONFIG = {
 
 
 // --- BaseTagBadge (generic) -------------------------------------------------------
-// Generic colored text chip — for tones, genres, plain tags.
+// Generic colored text chip - for tones, genres, plain tags.
 
 export function BaseTagBadge({ children, className = "" }) {
   return (
@@ -131,7 +131,7 @@ export function VibeBadge({ category, value }) {
     const entry = config[v] ?? config["unknown"];
     if (!entry) return null;
 
-    // Skip rendering unknown values entirely — keeps the card clean
+    // Skip rendering unknown values entirely - keeps the card clean
     if (v === "unknown" && category!="ending_type") return null;
 
     const IconComponent = entry.icon;
@@ -179,11 +179,3 @@ export function MatchScoreBadge({ score }) {
         </span>
     );
 }
-
-// const toTitleCase = (str) => {
-//     if (!str) return "";
-//     return str
-//         .split(/[\s_-]+/)        // split on spaces, underscores, hyphens
-//         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-//         .join(" ");
-// }

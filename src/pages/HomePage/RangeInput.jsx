@@ -7,9 +7,8 @@ export default function RangeInput({ value, onChange, placeholders = ["From", "T
 
     const handleChange = (index, newValue) => {
         const nextValue = [...value];
-        // Convert to number if possible, otherwise keep as string for input flexibility
+        // Convert to number
         nextValue[index] = newValue === "" ? null : Number(newValue);
-        // nextValue[index] = newValue;
         onChange(nextValue);
     };
 
@@ -18,9 +17,7 @@ export default function RangeInput({ value, onChange, placeholders = ["From", "T
             <Input
                 type="number"
                 placeholder={placeholders[0]}
-                // value={from?.toString() || ""}
                 value={from || ""}
-                // onValueChange={(val) => handleChange(0, val)}
                 onChange={(event) => handleChange(0, event.target.value)}
                 variant="secondary"
                 className="max-w-xs min-w-0 text-xs"
@@ -31,9 +28,7 @@ export default function RangeInput({ value, onChange, placeholders = ["From", "T
             <Input
                 type="number"
                 placeholder={placeholders[1]}
-                // value={to?.toString() || ""}
                 value={to || ""}
-                // onValueChange={(val) => handleChange(1, val)}
                 onChange={(event) => handleChange(1, event.target.value)}
                 variant="secondary"
                 className="max-w-xs min-w-0 text-xs"

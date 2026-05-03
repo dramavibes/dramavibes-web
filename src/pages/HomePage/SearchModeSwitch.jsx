@@ -5,7 +5,6 @@ export default function SearchModeSwitch({ searchMode, setSearchMode, className 
     return (
         <Tabs className={`w-full max-w-md ${className}`} selectedKey={searchMode} onSelectionChange={key => setSearchMode(key)}>
             <Tabs.ListContainer>
-                {/* w-fit *:h-6 *:w-fit *:px-3 *:text-sm *:font-normal *:data-[selected=true]:text-accent-foreground */}
                 <Tabs.List aria-label="Options" className="rounded-full *:text-[16px] *:font-normal *:py-6 *:pt-6.5 *:data-[selected=true]:text-accent-foreground">
                     <Tabs.Tab id="vibe">
                         <div>
