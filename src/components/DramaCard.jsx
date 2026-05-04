@@ -36,8 +36,8 @@ export default function DramaCard({ drama, showEnding=false, className="" }) {
                 bg-surface border border-border dark:border-accent/10
                 cursor-pointer select-none
                 transition-transform duration-200 ease-out
-                hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20
-                dark:hover:shadow-xl dark:hover:shadow-accent/20
+                hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20
+                dark:hover:shadow-lg dark:hover:shadow-accent/20
                 ${className}
             `}
             render={(props)=><Link {...props} to={`/title/${slug}`}/>}

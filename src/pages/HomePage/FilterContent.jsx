@@ -89,7 +89,7 @@ export default function FilterPanel({
     if (variant == "desktop") {
         return (
             <Surface className={`
-                min-w-0 overflow-x-hidden rounded-xl m-2
+                min-w-0 overflow-x-hidden rounded-xl m-2 mt-0
             `}>
                 <div className="p-4">
                     {renderFilterContent()}

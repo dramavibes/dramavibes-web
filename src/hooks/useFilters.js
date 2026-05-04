@@ -88,7 +88,8 @@ export const FILTER_CONFIG = {
     },
     page: {
         type: "value"
-    }
+    },
+    limit : {type: "value"},
 }
 
 export function useFilters() {
@@ -137,115 +138,7 @@ export function useFilters() {
     };
 
 
-    const buildSearchParams = (filters) => {
-        const params = new URLSearchParams();
-
-        for (const key in FILTER_CONFIG) {
-            const value = filters[key];
-            const config = FILTER_CONFIG[key];
-
-           if (value !== undefined && value !== null) {
-                // 1. Range Handling (min,max)
-                if (config.type === "range") {
-                    const [min, max] = value;
-                    // Only add to URL if at least one value exists
-                    if ((min !== "" && min != null) || (max !== "" && max != null)) {
-                        params.set(key, `${min},${max}`);
-                    }
-                }
-                // 2. Multi-select Handling
-                else if (config.type === "multiselect" && value.length > 0) {
-                    params.set(key, value.join(","));
-                }
-                // 3. Select Handling (Single Value)
-                else if ((config.type === "select" ||  config.type === "value") && value !== "") {
-                    params.set(key, value);
-                }
-            }
-        }
-        if(params.mode == "vibe"){
-            delete params.page
-        }
-
-        // if (filters.sort_by) {
-        //     params.set("sort", `${filters.sort_by}:${filters.sort_order}`);
-        // }
-
-        return params;
-    };
-
-    const parseParamsToFilters = (params) => {
-        let filters = { ...DEFAULT_FILTERS };
-
-        for (const key in FILTER_CONFIG) {
-            const paramValue = params[key];
-            const config = FILTER_CONFIG[key];
-
-            if (paramValue) {
-                if (config.type === "multiselect") {
-                    filters[key] = paramValue.split(",");
-                }
-                // Parse Range: ensure it returns [string, string]
-                else if (config.type === "range") {
-                    const parts = paramValue.split(",");
-                    filters[key] = parts.map((val) => {
-                        if (val === "undefined" || val==null) return null;
-                        // Convert to number if value exists
-                        return Number(val);
-                    });
-                }
-                // Parse Select: single string
-                else if (config.type === "select" || config.type === "value") {
-                    if(key=="page"){
-                        filters[key] = Number(paramValue);
-                    } else{
-                        filters[key] = paramValue;
-                    }
-                }
-            }
-        }
-        return filters;
-    };
-
-    const buildQuery = (filters) => {
-        let res = {}
-        for(const key in filters){
-            if(!(key in FILTER_CONFIG)){console.log("!!KEY:", key); continue}
-
-            const type = FILTER_CONFIG[key].type
-            const val = filters[key]
-
-            if(key === "page"){
-                const page_number = Number(val)
-                if(page_number>1){
-                    const items_per_page = 20
-                    res.offset = (page_number-1) * items_per_page
-                    res.limit = items_per_page
-                }
-            }
-            
-            else if(type == "multiselect"){
-                if(val?.length>0){
-                    res[key] = val
-                }
-            }
-            else if(type=="range"){
-                const [gte, lte] = val
-                if(gte!=null || lte!=null){
-                    let rangeVal = {}
-                    if(gte){rangeVal.gte = gte}
-                    if(lte){rangeVal.lte = lte}
-                    res[key] = rangeVal;
-                }
-            }
-            else if(type=="select" && val && val!==""){
-                res[key] = val
-            }
-
-        }
-
-        return res;
-    }
+    
 
     const isNum = (n) => !(n==null || isNaN(n))
 
@@ -302,4 +195,120 @@ export function useFilters() {
 
     return { appliedFilters, setAppliedFilters, updateFilter, resetFilters, filterConfig, buildSearchParams, parseParamsToFilters, buildQuery, getFilterCounts };
 
+}
+
+
+
+export const buildSearchParams = (filters) => {
+    const params = new URLSearchParams();
+
+    for (const key in FILTER_CONFIG) {
+        const value = filters[key];
+        const config = FILTER_CONFIG[key];
+
+        if (value !== undefined && value !== null) {
+            // 1. Range Handling (min,max)
+            if (config.type === "range") {
+                const [min, max] = value;
+                // Only add to URL if at least one value exists
+                if ((min !== "" && min != null) || (max !== "" && max != null)) {
+                    params.set(key, `${min},${max}`);
+                }
+            }
+            // 2. Multi-select Handling
+            else if (config.type === "multiselect" && value.length > 0) {
+                params.set(key, value.join(","));
+            }
+            // 3. Select Handling (Single Value)
+            else if ((config.type === "select" || config.type === "value") && value !== "") {
+                params.set(key, value);
+            }
+        }
+    }
+    if (params.mode == "vibe") {
+        delete params.page
+    }
+
+    // if (filters.sort_by) {
+    //     params.set("sort", `${filters.sort_by}:${filters.sort_order}`);
+    // }
+
+    return params;
+};
+
+export const parseParamsToFilters = (params) => {
+    let filters = { ...DEFAULT_FILTERS };
+
+    for (const key in FILTER_CONFIG) {
+        const paramValue = params[key];
+        const config = FILTER_CONFIG[key];
+
+        if (paramValue) {
+            if (config.type === "multiselect") {
+                filters[key] = paramValue.split(",");
+            }
+            // Parse Range: ensure it returns [string, string]
+            else if (config.type === "range") {
+                const parts = paramValue.split(",");
+                filters[key] = parts.map((val) => {
+                    if (val === "undefined" || val == null) return null;
+                    // Convert to number if value exists
+                    return Number(val);
+                });
+            }
+            // Parse Select: single string
+            else if (config.type === "select" || config.type === "value") {
+                if (key == "page") {
+                    filters[key] = Number(paramValue);
+                } else {
+                    filters[key] = paramValue;
+                }
+            }
+        }
+    }
+    return filters;
+};
+
+export const buildQuery = (filters) => {
+    let res = {}
+    const items_per_page = filters.limit || 20;
+    res['limit'] = items_per_page
+
+    for (const key in filters) {
+        if (!(key in FILTER_CONFIG)) { console.log("!!KEY:", key); continue }
+
+        const type = FILTER_CONFIG[key].type
+        const val = filters[key]
+
+        if (key === "page") {
+            const page_number = Number(val)
+            // res.limit = items_per_page
+            if (page_number > 1) {
+                res.offset = (page_number - 1) * items_per_page
+            }
+        }
+
+        else if (type == "multiselect") {
+            if (val?.length > 0) {
+                res[key] = val
+            }
+        }
+        else if (type == "range") {
+            const [gte, lte] = val
+            if (gte != null || lte != null) {
+                let rangeVal = {}
+                if (gte) { rangeVal.gte = gte }
+                if (lte) { rangeVal.lte = lte }
+                res[key] = rangeVal;
+            }
+        }
+        else if (type == "select" && val && val !== "") {
+            res[key] = val
+        }
+
+    }
+
+    console.log("buidlQUERY:", res)
+
+    return res;
 }

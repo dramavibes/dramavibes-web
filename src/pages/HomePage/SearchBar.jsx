@@ -8,12 +8,26 @@ import {
 import {SearchIcon} from 'lucide-react'
 
 
-export default function SearchBar({ placeholder, onSubmit, isInvalid, errorMsg, defaultValue="" }) {
+export default function SearchBar({ 
+    // value, 
+    // setValue, 
+    placeholder, 
+    onSubmit, 
+    isInvalid, 
+    errorMsg, 
+    defaultValue="",
+    onQueryChange
+}) {
     const [value, setValue] = useState(defaultValue)
 
     useEffect(()=>{
         setValue(defaultValue)
     }, [defaultValue])
+
+    const handleChange = (val) => {
+        setValue(val)
+        onQueryChange(val)  // update ref on parent
+    }
 
     return (
         <TextField aria-label="search" className="w-full max-w-xl" isInvalid={isInvalid}>
@@ -22,7 +36,7 @@ export default function SearchBar({ placeholder, onSubmit, isInvalid, errorMsg, 
                     className="w-full ml-1 text-sm"
                     value={value}
                     placeholder={placeholder}
-                    onChange={(event) => setValue(event.target.value)}
+                    onChange={(event) => handleChange(event.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             onSubmit(value);
