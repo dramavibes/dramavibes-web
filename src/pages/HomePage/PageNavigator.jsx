@@ -43,11 +43,11 @@ export default function PageNavigator({total, itemsPerPage, page, setPage, showL
     const endItem = Math.min(page * itemsPerPage, totalItems);
 
     return (
-        <Pagination className={` ${className}`}>
-            <Pagination.Summary>
+        <Pagination className={`items-center gap-2 sm:gap-4 ${className}`}>
+            <Pagination.Summary className="self-center">
                 Showing {startItem}-{endItem} of {totalItems} results
             </Pagination.Summary>
-            <Pagination.Content>
+            <Pagination.Content className="self-center">
                 <Pagination.Item>
                     <Pagination.Previous isDisabled={page === 1} onPress={() => setPage(page - 1)}>
                         <Pagination.PreviousIcon />

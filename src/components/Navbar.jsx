@@ -11,7 +11,7 @@ export default function Navbar(){
     return (
         <nav className="
             bg-background flex justify-around items-center
-            pt-5 pb-3 px-5 h-[68px]
+            pt-5 pb-3 pr-4 sm:px-5 h-[68px]
         ">  
             <h1 
                 // onClick={()=>navigate("/")} 
@@ -28,6 +28,7 @@ export default function Navbar(){
                 isIconOnly 
                 onClick={toggle}
                 variant='tertiary'
+                size='sm'
             >
                 <IconComponent className="text-muted" fill='currentColor'/>
             </Button>

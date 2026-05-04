@@ -165,7 +165,7 @@ export default function HomePage() {
 
             {/* ------------------------ Search Section --------------------- */}
             <div className="flex flex-col items-center px-3">
-                <p className="px-5 lg:px-8 pt-3 text-center text-[16px] sm:text-2xl text-foreground/80 mt-1">
+                <p className="max-w-70 sm:max-w-full lg:px-8 pt-3 text-center text-xl sm:text-2xl text-foreground/80 mt-1">
                     Find your next Asian drama by vibe, not just title.
                 </p>
 
@@ -222,11 +222,25 @@ export default function HomePage() {
                     </pre> */}
 
                     {/* -------- Actual Results Grid -------- */}
-                    <div className="px-5 mt-1 pb-6 transition-all duration-300">
-                        {response?.total != null && <div className="mb-3 text-muted text-sm text-right">{`${response.total} result${response.total > 1 ? 's' : ''} found`}</div>}
+                    <div className="px-3 sm:px-5 mt-1 pb-6 transition-all duration-300">
+                        {/* {response?.total != null && <div className="mb-3 text-muted text-sm text-right">{`${response.total} result${response.total > 1 ? 's' : ''} found`}</div>} */}
                         {response?.results && response.results.length == 0 && <div className="text-muted text-center">No results found!</div>}
                         
                         {loading && <LoadingSpinner/>}
+
+                        {(response?.results?.length && response?.total > response?.limit && appliedFilters.mode==="classic") ? 
+                            <PageNavigator 
+                                page={appliedFilters.page || 1} 
+                                setPage={handlePageChange} 
+                                itemsPerPage={response.limit} 
+                                total={response.total} 
+                                showLabels={isLargeScreen}
+                                className="mt-2 mb-3 pl-2"
+                            />
+                            :
+                            <div className="mb-5"/>
+                        }
+
                         <DramaGrid isFilterPanelOpen={isFilterPanelOpen && isLargeScreen}>
                             {response?.results?.map(drama => <DramaCard key={drama.slug} drama={drama} />)}
                         </DramaGrid>

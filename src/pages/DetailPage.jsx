@@ -248,7 +248,7 @@ function Spoiler({ children, warningText="Reveal Spoiler!" }) {
             onClick={() => setOpen(true)}
             variant="outline"
             size="sm"
-            className="text-xs h-6 bg-warning-soft hover:bg-warning-soft-hover text-amber-600 dark:text-warning border border-warning"
+            className="text-xs h-6 bg-warning-soft hover:bg-warning-soft-hover text-amber-600 dark:text-warning border border-warning px-2"
             // className="text-xs text-muted border border-default px-2 py-1 rounded-md cursor-pointer"
         >
             <TriangleAlertIcon/>

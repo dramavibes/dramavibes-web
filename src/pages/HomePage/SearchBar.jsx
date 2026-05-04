@@ -19,7 +19,7 @@ export default function SearchBar({ placeholder, onSubmit, isInvalid, errorMsg, 
         <TextField aria-label="search" className="w-full max-w-xl" isInvalid={isInvalid}>
             <InputGroup className="rounded-full h-12 dark:bg-surface-tertiary">
                 <InputGroup.Input
-                    className="w-full ml-1"
+                    className="w-full ml-1 text-sm"
                     value={value}
                     placeholder={placeholder}
                     onChange={(event) => setValue(event.target.value)}

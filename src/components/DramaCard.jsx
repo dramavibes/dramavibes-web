@@ -89,7 +89,7 @@ export default function DramaCard({ drama, showEnding=false, className="" }) {
         <Card.Content className="px-2.5 pb-3 -mt-1 flex flex-col">
 
             {/* Title */}
-            <h3 className="text-[13px] font-bold text-foreground leading-snug truncate mb-1">
+            <h3 className="text-[13px] font-bold text-foreground leading-snug truncate mb-0.5 sm:mb-1">
             {title}
             </h3>
 

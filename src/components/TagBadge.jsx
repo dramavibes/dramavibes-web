@@ -12,7 +12,8 @@ import {
     // Sun, Sunset, 
 } from "lucide-react";
 
-const BADGE_TEXT_SIZE = 12.5
+const BADGE_TEXT_SIZE = "text-[12px] sm:text-[12.5px]"
+const BADGE_ICON_SIZE = 12.5
 
 // --- Pacing ------------------------------------------------------------------
 
@@ -98,8 +99,12 @@ export function BaseTagBadge({ children, className = "" }) {
   return (
     <span
       className={`
-        inline-flex items-center gap-1 px-2 pb-[5px] pt-[4px] rounded-full
-        text-[${BADGE_TEXT_SIZE}px] font-medium leading-none capitalize
+        inline-flex items-center gap-1  
+        px-[6px] sm:px-2 
+        pb-1 pt-[3px] sm:pb-[5px] sm:pt-[4px] 
+        rounded-full
+        ${BADGE_TEXT_SIZE} font-medium leading-none capitalize 
+        tracking-tight sm:tracking-normal
         ${className}
       `}
     >
@@ -141,7 +146,7 @@ export function VibeBadge({ category, value }) {
     return (
         <BaseTagBadge className={entry.classes}>
             <IconComponent
-                size={BADGE_TEXT_SIZE}
+                size={BADGE_ICON_SIZE}
                 strokeWidth={2}
                 fill={isFilled ? "currentColor" : "none"}
                 className="shrink-0"
