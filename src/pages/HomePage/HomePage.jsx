@@ -104,6 +104,16 @@ export default function HomePage() {
     // NOTE this was in useCallback before, removed it to check if performance reamins same
     const handleFilterApply = (dirtyFilters) => {
         console.log("[handleFilterApply]", dirtyFilters, "applied filter:", appliedFilters)
+        if(searchMode == "vibe" && !latestQueryRef.current){
+            console.log("handleFilterApply VIBE ERROR")
+            setSearchError("Query must be at least 3 characters!")
+            scrollSearchBarIntoView()
+            // return;
+        }
+        else{
+            console.log("handleFilterApply VIBE PASS")
+            setSearchError("")
+        }
 
         const newFilters = {
             ...dirtyFilters,
@@ -152,7 +162,7 @@ export default function HomePage() {
 
                 <SearchModeSwitch
                     searchMode={searchMode}
-                    setSearchMode={setSearchMode}
+                    setSearchMode={(val)=>{setSearchMode(val);setSearchError("")}}
                     // searchMode={appliedFilters["mode"]}
                     // setSearchMode={val => updateFilter("mode", val)}
                     className="mt-6"
