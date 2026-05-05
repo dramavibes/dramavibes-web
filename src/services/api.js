@@ -74,6 +74,6 @@ export async function getFilterOptions() {
 }
 
 export async function checkHealth() {
-    const { data } = await client.get("/health", { timeout: 5000 })
+    const { data } = await client.get("/health", { timeout: 3000 })
     return data
 }

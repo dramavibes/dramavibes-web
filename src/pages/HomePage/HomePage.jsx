@@ -226,7 +226,7 @@ export default function HomePage() {
                                 Something went wrong! 
                                 <div className="text-xs">{queryError.message}</div>
                             </div>
-                            }
+                        }
 
                         {(response?.results?.length && response?.total > response?.limit && appliedFilters.mode==="classic") ? 
                             <PageNavigator 
@@ -265,9 +265,9 @@ export default function HomePage() {
     )
 }
 
-function LoadingSpinner({size="lg"}) {
+function LoadingSpinner({size="lg", className=""}) {
     return (
-        <div className="flex justify-center items-center gap-4 p-1 mt-4">
+        <div className={`flex justify-center items-center gap-4 p-1 mt-4 ${className}`}>
             <Spinner size={size}/>
         </div>
     )
@@ -294,24 +294,34 @@ function HorizontalResults({heading, filters}) {
         staleTime: Infinity,
     })
 
+
     return (
         // <div className="border-t border-b sm:border border-accent-soft rounded-none sm:rounded-xl bg-accent-soft">
         <div className="
             rounded-none sm:rounded-xl
             bg-linear-to-b from-surface dark:from-background-tertiary to-background
+            min-h-60
         ">
             <div className="px-4 pt-2 flex justify-between items-center">
                 {heading && <h1 className="text-xl font-semibold">{heading}</h1>}
                 {searchParams && <Link to={{pathname: "/", search: `?${searchParams}`}} className="text-sm hover:underline leading-snug">View All</Link>}
             </div>
+            
+            {loading && <LoadingSpinner className="mt-8"/>}
+            {error && 
+                <div  className="p-1 mt-10 text-muted text-center w-full">
+                    Something went wrong! 
+                    <div className="text-xs">{error?.message}</div>
+                </div>
+            }
             <div className="
                 flex gap-4 w-full overflow-auto p-4 justify-stretch 
                 snap-x snap-mandatory scroll-px-3.5 no-scrollbar
             ">
-
                 {response?.results?.map(drama => (
                     <DramaCard key={drama.slug} drama={drama} className="w-[180px] sm:w-[200px] shrink-0 snap-start" />
                 ))}
+                
             </div>
         </div>
     )
